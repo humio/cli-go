@@ -29,7 +29,10 @@ func newUsersRemoveCmd() *cobra.Command {
 
 			client := NewApiClient(cmd)
 
-			removedUser, err := client.Users().Remove(username)
+			user, err := client.Users().Get(username)
+			exitOnError(cmd, err, "Error looking up user")
+
+			removedUser, err := client.Users().Remove(user.ID)
 			exitOnError(cmd, err, "Error removing the user")
 
 			printUserTable(cmd, removedUser)

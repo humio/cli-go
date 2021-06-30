@@ -21,7 +21,7 @@ import (
 
 func newUsersUpdateCmd() *cobra.Command {
 	var rootFlag boolPtrFlag
-	var nameFlag, companyFlag, emailFlag, countryCodeFlag stringPtrFlag
+	var firstNameFlag, lastNameFlag, companyFlag, emailFlag, countryCodeFlag stringPtrFlag
 	var pictureFlag urlPtrFlag
 
 	cmd := cobra.Command{
@@ -30,11 +30,15 @@ func newUsersUpdateCmd() *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			username := args[0]
-
 			client := NewApiClient(cmd)
-			user, apiErr := client.Users().Update(username, api.UserChangeSet{
+
+			user, err := client.Users().Get(username)
+			exitOnError(cmd, err, "Error looking up user")
+
+			user, apiErr := client.Users().Update(user.ID, api.UserChangeSet{
 				IsRoot:      rootFlag.value,
-				FullName:    nameFlag.value,
+				FirstName:   firstNameFlag.value,
+				LastName:    lastNameFlag.value,
 				Company:     companyFlag.value,
 				CountryCode: countryCodeFlag.value,
 				Email:       emailFlag.value,
@@ -47,7 +51,8 @@ func newUsersUpdateCmd() *cobra.Command {
 	}
 
 	cmd.Flags().Var(&rootFlag, "root", "If true grants root access to the user.")
-	cmd.Flags().Var(&nameFlag, "name", "The full name of the user.")
+	cmd.Flags().Var(&firstNameFlag, "first-name", "The first name of the user.")
+	cmd.Flags().Var(&lastNameFlag, "last-name", "The last name of the user.")
 	cmd.Flags().Var(&countryCodeFlag, "country-code", "A two letter country code.")
 	cmd.Flags().Var(&companyFlag, "company", "The company where the user works.")
 	cmd.Flags().Var(&pictureFlag, "picture", "A URL to an avatar for user.")
