@@ -51,16 +51,16 @@ func (p *Parsers) List(reposistoryName string) ([]ParserListItem, error) {
 	return parsers, graphqlErr
 }
 
-func (p *Parsers) Remove(reposistoryName string, parserName string) error {
+func (p *Parsers) Remove(reposistoryName string, parserId string) error {
 	var mutation struct {
 		RemoveParser struct {
 			Type string `graphql:"__typename"`
-		} `graphql:"removeParser(input: { name: $name, repositoryName: $repositoryName })"`
+		} `graphql:"removeParser(input: { id: $id, repositoryName: $repositoryName })"`
 	}
 
 	variables := map[string]interface{}{
 		"repositoryName": graphql.String(reposistoryName),
-		"name":           graphql.String(parserName),
+		"id":             graphql.String(parserId),
 	}
 
 	return p.client.Mutate(&mutation, variables)
@@ -110,7 +110,7 @@ func testCasesToStrings(parser *Parser) []graphql.String {
 	return result
 }
 
-func (p *Parsers) Get(reposistoryName string, parserName string) (*Parser, error) {
+func (p *Parsers) Get(reposistoryName string, parserId string) (*Parser, error) {
 
 	var query struct {
 		Repository struct {
@@ -119,12 +119,12 @@ func (p *Parsers) Get(reposistoryName string, parserName string) (*Parser, error
 				SourceCode string
 				TestData   []string
 				TagFields  []string
-			} `graphql:"parser(name: $parserName)"`
+			} `graphql:"parser(id: $parserId)"`
 		} `graphql:"repository(name: $repositoryName)"`
 	}
 
 	variables := map[string]interface{}{
-		"parserName":     graphql.String(parserName),
+		"parserId":       graphql.String(parserId),
 		"repositoryName": graphql.String(reposistoryName),
 	}
 
@@ -158,18 +158,18 @@ func toTestCase(line string) ParserTestCase {
 	}
 }
 
-func (p *Parsers) Export(reposistoryName string, parserName string) (string, error) {
+func (p *Parsers) Export(reposistoryName string, parserId string) (string, error) {
 
 	var query struct {
 		Repository struct {
 			Parser struct {
 				YamlTemplate string
-			} `graphql:"parser(name: $parserName)"`
+			} `graphql:"parser(id: $parserId)"`
 		} `graphql:"repository(name: $repositoryName)"`
 	}
 
 	variables := map[string]interface{}{
-		"parserName":     graphql.String(parserName),
+		"parserId":       graphql.String(parserId),
 		"repositoryName": graphql.String(reposistoryName),
 	}
 

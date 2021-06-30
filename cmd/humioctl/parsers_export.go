@@ -31,16 +31,16 @@ func newParsersExportCmd() *cobra.Command {
 		Args:  cobra.ExactArgs(2),
 		Run: func(cmd *cobra.Command, args []string) {
 			repo := args[0]
-			parserName := args[1]
+			parserId := args[1]
 
 			if outputName == "" {
-				outputName = parserName
+				outputName = parserId
 			}
 
 			// Get the HTTP client
 			client := NewApiClient(cmd)
 
-			yamlData, apiErr := client.Parsers().Export(repo, parserName)
+			yamlData, apiErr := client.Parsers().Export(repo, parserId)
 			if apiErr != nil {
 				cmd.Println(fmt.Errorf("Error fetching parsers: %s", apiErr))
 				os.Exit(1)
